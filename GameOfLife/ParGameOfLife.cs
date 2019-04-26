@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace GameOfLife
 {
-    class GameOfLife
+    class ParGameOfLife
     {
-        private readonly int _gridSize;
-        private const int AliveThreshold = 25;
-        private int[,] _curGrid;
-        private int[,] _newGrid;
+        private readonly long _gridSize;
+        private const long AliveThreshold = 25;
+        private long[,] _curGrid;
+        private long[,] _newGrid;
 
-
-        public GameOfLife(int gridSize)
+        public ParGameOfLife(int gridSize)
         {
             _gridSize = gridSize;
-            _curGrid = new int[_gridSize, _gridSize];
-            _newGrid = new int[_gridSize, _gridSize];
+            _curGrid = new long[_gridSize, _gridSize];
+            _newGrid = new long[_gridSize, _gridSize];
 
             var rnd = new Random();
             for (var row = 0; row < _gridSize; row++)
@@ -26,13 +27,16 @@ namespace GameOfLife
             }
         }
 
-
-        public void Run(int numberOfIterations)
+        public void Run(long numberOfIterations)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Reset();
+            stopwatch.Start();
             while (numberOfIterations > 0)
             {
                 var locationsAlive = 0;
-                for (var row = 0; row < _gridSize; row++)
+
+                Parallel.For(0, _gridSize, row =>
                 {
                     for (var col = 0; col < _gridSize; col++)
                     {
@@ -46,14 +50,16 @@ namespace GameOfLife
                             _newGrid[row, col] = 0;
                         }
                     }
-                }
+                });
                 Swap(ref _curGrid, ref _newGrid);
-                Console.WriteLine(locationsAlive);
+                Console.WriteLine("\t\t{0}", locationsAlive);
                 numberOfIterations--;
             }
+            stopwatch.Stop();
+            System.Console.WriteLine("Parallel time elapsed {0}", stopwatch.ElapsedMilliseconds);
         }
 
-        private bool ShallLocationBeAlive(int row, int col)
+        private bool ShallLocationBeAlive(long row, long col)
         {
             var liveNeighbors = CalcAliveNeighbors(row, col);
 
@@ -69,9 +75,9 @@ namespace GameOfLife
             return false;   // Die
         }
 
-        private int CalcAliveNeighbors(int row, int col)
+        private long CalcAliveNeighbors(long row, long col)
         {
-            int liveNeighbors;
+            long liveNeighbors;
 
             // Implementation of GameOfLife-rules
             if (row == 0)   // Top row
@@ -137,3 +143,4 @@ namespace GameOfLife
         }
     }
 }
+

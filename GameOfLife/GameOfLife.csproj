@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameOfLife.cs" />
+    <Compile Include="BarGameOfLife.cs" />
+    <Compile Include="SeqGameOfLife.cs" />
+    <Compile Include="ParGameOfLife.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
